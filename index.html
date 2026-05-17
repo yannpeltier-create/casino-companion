@@ -290,10 +290,15 @@ const EMAILJS_TEMPLATE_ID = 'template_6yw6fyd';
 const params = new URLSearchParams(window.location.search);
 const MAS_ID = params.get('mas') || 'MAS-000';
 
-const MAS_POSITION = {
-  'MAS-1034': 'MAIN',
-  'MAS-1183':  'DOME',
+const MAS_CONFIG = {
+  'MAS-1034': { position: 'MAIN', zone_livraison: true  },
+  'MAS-1183': { position: 'DOME', zone_livraison: false },
 };
+
+const masConfig    = MAS_CONFIG[MAS_ID] || { position: 'Position inconnue', zone_livraison: false };
+const MAS_POSITION = { [MAS_ID]: masConfig.position }; // conserve la compatibilité mail
+const ZONE_LIVRAISON = masConfig.zone_livraison;
+
 
 const LINKS = {
   hotel:                 'https://casino2000.lu/fr/hotel-casino-2000/',
@@ -604,11 +609,14 @@ function renderRestauration() {
 
         <div class="sub-item">
           <h3>Snack Bar</h3>
-          <p>${T.snack_desc}</p>
+          <p>${ZONE_LIVRAISON ? T.snack_desc : T.zone_inactive}</p>
           <div class="action-btns">
-            <button class="btn-action" onclick="window.open('${LINKS.snack_commande}','_blank')">${T.commander}</button>
-          </div>
+            ${ZONE_LIVRAISON
+              ? `<button class="btn-action" onclick="window.open('${LINKS.snack_commande}','_blank')">${T.commander}</button>`
+              : `<span class="btn-action disabled">${T.commander}</span>`
+            }
         </div>
+      </div>
 
         <div class="sub-item">
           <h3>Restaurant Purple</h3>
