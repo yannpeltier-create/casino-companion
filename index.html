@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Casino Assistant</title>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a0a1a;
+      color: #fff;
+      min-height: 100vh;
+      padding: 20px 16px 40px;
+    }
+
+    #app {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .header h1 {
+      font-size: 2em;
+      color: #f0c040;
+      margin-bottom: 4px;
+    }
+    .header .mas-id {
+      font-size: 0.8em;
+      color: #888;
+    }
+
+    /* ── RANGÉE TECHNIQUE + PHYSIQUE ── */
+    .row-top {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .btn-top {
+      flex: 1;
+      height: 110px;
+      background: #12122a;
+      border: 1.5px solid #2a2a4a;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      color: #fff;
+      text-align: center;
+      transition: background 0.2s;
+      padding: 0 12px;
+    }
+    .btn-top:active { background: #1e1e40; }
+    .btn-top .btn-label {
+      font-weight: 700;
+      font-size: 2em;
+      line-height: 1.2;
+    }
+    .btn-top .icons-inline {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    /* ── URGENCE ── */
+    .btn-urgence {
+      width: 100%;
+      height: 110px;
+      background: #2a0a0a;
+      border: 1.5px solid #E63946;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      cursor: pointer;
+      color: #E63946;
+      margin-bottom: 10px;
+      transition: background 0.2s;
+      padding: 0 20px;
+    }
+    .btn-urgence:active { background: #E63946; color: #fff; }
+    .btn-urgence .urgence-label {
+      font-weight: 700;
+      font-size: 2em;
+    }
+
+    /* ── BOUTONS STANDARDS ── */
+    .btn-main {
+      width: 100%;
+      background: #12122a;
+      border: 1.5px solid #2a2a4a;
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      text-align: center;
+      color: #fff;
+      font-size: 1em;
+      transition: background 0.2s;
+      text-decoration: none;
+    }
+    .btn-main:active { background: #1e1e40; }
+    .btn-main .label {
+      font-weight: 600;
+      font-size: 1em;
+      text-align: center;
+    }
+
+    /* ── SOUS-MENUS ── */
+    .submenu {
+      background: #12122a;
+      border: 1.5px solid #2a2a4a;
+      border-radius: 14px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .submenu-header {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      color: #fff;
+      font-size: 1em;
+      text-align: center;
+    }
+    .submenu-header .label {
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .submenu-body {
+      display: none;
+      padding: 0 12px 12px;
+    }
+    .submenu-body.open { display: block; }
+
+    .sub-item {
+      background: #12122a;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+    }
+    .sub-item h3 {
+      font-size: 0.95em;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #f0c040;
+    }
+    .sub-item p {
+      font-size: 0.82em;
+      color: #aaa;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .action-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .btn-action {
+      flex: 1;
+      min-width: 100px;
+      background: #f0c040;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 0.82em;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-action.secondary {
+      background: #1e1e40;
+      color: #f0c040;
+      border: 1px solid #f0c040;
+    }
+    .btn-action.disabled {
+      background: #1a1a2e;
+      color: #555;
+      border: 1px solid #333;
+      cursor: not-allowed;
+    }
+
+    /* ── OVERLAYS ── */
+    .confirm-overlay, .merci-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 100;
+    }
+    .confirm-card, .merci-card {
+      text-align: center;
+      max-width: 320px;
+    }
+    .confirm-card .big-icon, .merci-card .big-icon { font-size: 4em; margin-bottom: 16px; }
+    .confirm-card h2, .merci-card h2 { color: #f0c040; font-size: 1.3em; margin-bottom: 12px; }
+    .confirm-card p, .merci-card p { color: #ccc; line-height: 1.6; margin-bottom: 28px; }
+    .confirm-btns { display: flex; flex-direction: column; gap: 12px; }
+    .btn-confirm-send {
+      background: #E63946; color: #fff; border: none;
+      border-radius: 12px; padding: 14px 32px;
+      font-size: 1em; font-weight: 700; cursor: pointer;
+    }
+    .btn-confirm-cancel {
+      background: #1e1e40; color: #aaa; border: 1px solid #333;
+      border-radius: 12px; padding: 14px 32px;
+      font-size: 1em; cursor: pointer;
+    }
+    .btn-merci-retour {
+      background: #f0c040; color: #000; border: none;
+      border-radius: 12px; padding: 14px 32px;
+      font-size: 1em; font-weight: 700; cursor: pointer;
+    }
+
+    /* ── FOOTER ── */
+    .footer-social {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 24px;
+      padding: 24px 0 8px;
+    }
+    .footer-social a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: #12122a;
+      border: 1.5px solid #2a2a4a;
+      color: #888;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .footer-social a:active {
+      border-color: #f0c040;
+      color: #f0c040;
+    }
+
+    /* ── ICÔNES INLINE ── */
+    .icon-wifi { display: inline-block; vertical-align: middle; }
+    .icon-exclaim {
+      display: inline-block;
+      vertical-align: middle;
+      font-style: normal;
+      font-weight: 900;
+      font-size: 1.1em;
+      color: #f0c040;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+emailjs.init('ThVGOKiVOP1ssjR7A');
+
+const EMAILJS_SERVICE_ID  = 'gmail_casino';
+const EMAILJS_TEMPLATE_ID = 'template_6yw6fyd';
+
+const params = new URLSearchParams(window.location.search);
+const MAS_ID = params.get('mas') || 'MAS-000';
+
+const MAS_POSITION = {
+  'MAS-1083': 'MAIN',
+  'MAS-927':  'CENTER',
+};
+
+const LINKS = {
+  hotel:                 'https://casino2000.lu/fr/hotel-casino-2000/',
+  hotel_guest_directory: 'https://casino2000.lu/wp-content/uploads/2023/10/Guest-Directory-FR-1.pdf',
+  events:                'https://casino2000.lu/fr/agenda-du-casino-2000/',
+  snack_commande:        'https://commande.snackbar.com',
+  obypay:                'https://a-renseigner.com',
+  purple_carte:          'https://casino2000.lu/wp-content/uploads/2023/10/Carte_PUR_food__beverage_02_2026.pdf',
+  purple_reserve:        'https://bookings.zenchef.com/results?rid=356125&fullscreen=1',
+  roses_carte:           'https://casino2000.lu/wp-content/uploads/2023/10/Carte_Les_Roses_Avril_2026.pdf',
+  roses_reserve:         'https://bookings.zenchef.com/results?rid=356126&fullscreen=1',
+  offside_carte:         'https://casino2000.lu/wp-content/uploads/2022/05/Carte_Offside_CASINO2000_juin_2025_web.pdf',
+  offside_reserve:       'https://bookings.zenchef.com/results?rid=384015&fullscreen=1',
+  instagram:             'https://www.instagram.com/casino2000/',
+  youtube:               'https://www.youtube.com/channel/UCpLvd0rOsiSeKh94GWOJ0hA',
+  facebook:              'https://www.facebook.com/casino2000lu',
+  linkedin:              'https://www.linkedin.com/company/8289354/admin/feed/posts/',
+  site:                  'https://casino2000.lu/',
+};
+
+const TRANSLATIONS = {
+  fr: {
+    title:                'Assistance?',
+    urgence_label:        'Urgence Médicale',
+    technique_label:      'Technique',
+    physique_label:       'Humaine',
+    regles_label:         'Règles & Fonctionnement',
+    resto_label:          'Restaurants, Bar, Snack',
+    snack_desc:           '200 choix pour manger, boire ou grignoter.',
+    purple_desc:          'Cuisine classique et originale.',
+    roses_desc:           'Restaurant gastronomique.',
+    coopers_desc:         'Bar lounge premium, cocktails et musique.',
+    offside_desc:         'Ambiance sport.',
+    telecharger:          'Télécharger la carte',
+    reserver:             'Réserver',
+    commander:            'Commander',
+    zone_inactive:        'Zone non desservie',
+    hotel_label:          'Hôtel',
+    hotel_jour:           'Réserver une chambre',
+    hotel_nuit_cta:       'Appeler la réception',
+    events_label:         'Agenda & Promotions',
+    playsafe_label:       'Play it Safe',
+    playsafe_titre:       'Jouer de manière responsable',
+    playsafe_desc:        'Le programme « PLAY IT SAFE », lancé en 2002 par CASINO 2000, vise à prévenir le jeu problématique et à sensibiliser les clients au jeu responsable.',
+    playsafe_cta:         'Contacter un conseiller',
+    obypay_label:         'Obypay',
+    regles_rng_titre:     'Comment fonctionne une MAS ?',
+    regles_rng_desc:      'Une machine à sous utilise un RNG (générateur de nombres aléatoires) qui garantit des résultats indépendants à chaque spin.',
+    regles_carte_titre:   'Comment utiliser ma BONUS CARD ?',
+    regles_carte_desc:    'Insérez votre carte avant de jouer pour cumuler des points à chaque mise.',
+    regles_machine_titre: 'Cette machine',
+    regles_machine_desc:  'Slot vidéo 5 rouleaux. Consultez la table des gains sur l\'écran.',
+    regles_humain:        'Demander une explication',
+    confirm_title:        'Confirmer l\'envoi ?',
+    confirm_body:         'Un signal sera envoyé pour la machine',
+    confirm_send:         'Envoyer',
+    confirm_cancel:       'Annuler',
+    merci_title:          'Alerte envoyée !',
+    merci_body:           'Un membre de l\'équipe sera auprès de vous dans quelques minutes.',
+    merci_retour:         '← Retour à l\'accueil',
+  },
+  en: {
+    title:                'How can I help you?',
+    urgence_label:        'Medical Emergency',
+    technique_label:      'Technical Assistance',
+    physique_label:       'Personal Assistance',
+    regles_label:         'Rules & How to Play',
+    resto_label:          'Restaurant, Bar, Snack',
+    snack_desc:           '200 choices to eat, drink or snack.',
+    purple_desc:          'Classic and creative cuisine.',
+    roses_desc:           'Gastronomic restaurant.',
+    coopers_desc:         'Premium lounge bar, cocktails and music.',
+    offside_desc:         'Sports atmosphere.',
+    telecharger:          'Download menu',
+    reserver:             'Book a table',
+    commander:            'Order',
+    zone_inactive:        'Area not served',
+    hotel_label:          'Hotel',
+    hotel_jour:           'Book a room',
+    hotel_nuit_cta:       'Call reception',
+    events_label:         'Agenda & Promotions',
+    playsafe_label:       'Play it Safe',
+    playsafe_titre:       'Play responsibly',
+    playsafe_desc:        'The PLAY IT SAFE programme, launched in 2002 by CASINO 2000, aims to prevent problem gambling.',
+    playsafe_cta:         'Contact an advisor',
+    obypay_label:         'Obypay',
+    regles_rng_titre:     'How does a slot machine work?',
+    regles_rng_desc:      'A slot machine uses an RNG that guarantees independent results on every spin.',
+    regles_carte_titre:   'How do I use my BONUS CARD?',
+    regles_carte_desc:    'Insert your card before playing to accumulate points with every bet.',
+    regles_machine_titre: 'This machine',
+    regles_machine_desc:  '5-reel video slot. See the paytable on screen.',
+    regles_humain:        'Ask for an explanation',
+    confirm_title:        'Confirm sending?',
+    confirm_body:         'A signal will be sent for machine',
+    confirm_send:         'Send',
+    confirm_cancel:       'Cancel',
+    merci_title:          'Alert sent!',
+    merci_body:           'A team member will be with you in a few minutes.',
+    merci_retour:         '← Back to home',
+  },
+  de: {
+    title:                'Wie kann ich Ihnen helfen?',
+    urgence_label:        'Medizinischer Notfall',
+    technique_label:      'Technische Hilfe',
+    physique_label:       'Persönliche Hilfe',
+    regles_label:         'Regeln & Funktionsweise',
+    resto_label:          'Restaurant, Bar, Snack',
+    snack_desc:           '200 Auswahl zum Essen, Trinken oder Snacken.',
+    purple_desc:          'Klassische und kreative Küche.',
+    roses_desc:           'Gastronomisches Restaurant.',
+    coopers_desc:         'Premium Lounge Bar, Cocktails und Musik.',
+    offside_desc:         'Sport-Atmosphäre.',
+    telecharger:          'Speisekarte herunterladen',
+    reserver:             'Tisch reservieren',
+    commander:            'Bestellen',
+    zone_inactive:        'Bereich nicht bedient',
+    hotel_label:          'Hotel',
+    hotel_jour:           'Zimmer buchen',
+    hotel_nuit_cta:       'Rezeption anrufen',
+    events_label:         'Agenda & Aktionen',
+    playsafe_label:       'Play it Safe',
+    playsafe_titre:       'Verantwortungsvoll spielen',
+    playsafe_desc:        'Das PLAY IT SAFE Programm, 2002 von CASINO 2000 ins Leben gerufen, zielt darauf ab, problematisches Spielverhalten zu verhindern.',
+    playsafe_cta:         'Berater kontaktieren',
+    obypay_label:         'Obypay',
+    regles_rng_titre:     'Wie funktioniert ein Spielautomat?',
+    regles_rng_desc:      'Ein Spielautomat verwendet einen RNG, der bei jedem Spin unabhängige Ergebnisse garantiert.',
+    regles_carte_titre:   'Wie verwende ich meine BONUS CARD?',
+    regles_carte_desc:    'Stecken Sie Ihre Karte vor dem Spielen ein, um Punkte zu sammeln.',
+    regles_machine_titre: 'Dieses Gerät',
+    regles_machine_desc:  '5-Walzen-Videoslot. Siehe Gewinntabelle auf dem Bildschirm.',
+    regles_humain:        'Erklärung anfragen',
+    confirm_title:        'Senden bestätigen?',
+    confirm_body:         'Ein Signal wird für Maschine gesendet',
+    confirm_send:         'Senden',
+    confirm_cancel:       'Abbrechen',
+    merci_title:          'Alarm gesendet!',
+    merci_body:           'Ein Teammitglied wird in wenigen Minuten bei Ihnen sein.',
+    merci_retour:         '← Zurück zur Startseite',
+  },
+};
+
+const SUPPORTED_LANGS = ['fr','en','de'];
+const FALLBACK_LANG   = 'en';
+
+function detectLang() {
+  const url = new URLSearchParams(window.location.search).get('lang');
+  if (url && SUPPORTED_LANGS.includes(url)) return url;
+  const nav = (navigator.language || navigator.userLanguage || '').substring(0, 2).toLowerCase();
+  return SUPPORTED_LANGS.includes(nav) ? nav : FALLBACK_LANG;
+}
+
+const T = TRANSLATIONS[detectLang()] || TRANSLATIONS['en'];
+
+let confirmAction = null;
+let showMerci     = false;
+let openSubmenu   = null;
+let isSending     = false;
+
+// ─── ICÔNES SVG ───────────────────────────────────────────────
+function iconWifi() {
+  return `<svg class="icon-wifi" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f0c040" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M5 12.55a11 11 0 0 1 14.08 0"/>
+    <path d="M1.42 9a16 16 0 0 1 21.16 0"/>
+    <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+    <circle cx="12" cy="20" r="1" fill="#f0c040"/>
+  </svg>`;
+}
+
+function iconExclaim() {
+  return `<span class="icon-exclaim">!</span>`;
+}
+
+// ─── RENDER PRINCIPAL ─────────────────────────────────────────
+function render() {
+  const app = document.getElementById('app');
+  if (!app) return;
+
+  app.innerHTML = `
+    <div class="header">
+      <h1>${T.title}</h1>
+      <div class="mas-id">Machine : ${MAS_ID}</div>
+    </div>
+
+    ${renderTopRow()}
+    ${renderUrgence()}
+    ${renderRegles()}
+    ${renderPlaySafe()}
+    ${renderObypay()}
+    ${renderRestauration()}
+    ${renderHotel()}
+    ${renderLinkBtn(T.events_label, LINKS.events)}
+    ${renderFooterSocial()}
+  `;
+
+  bindEvents();
+  renderOverlays();
+}
+
+// ─── RANGÉE TECHNIQUE + PHYSIQUE ──────────────────────────────
+function renderTopRow() {
+  return `
+    <div class="row-top">
+      <button class="btn-top" data-action="technique">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <span class="btn-label">${T.technique_label}</span>
+          <span style="font-size:1.6em;">🔧</span>
+          <span class="icons-inline">${iconWifi()}${iconExclaim()}</span>
+        </div>
+      </button>
+      <button class="btn-top" data-action="physique">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <span class="btn-label">${T.physique_label}</span>
+          <span style="font-size:1.6em;">🤙</span>
+          <span class="icons-inline">${iconWifi()}${iconExclaim()}</span>
+        </div>
+      </button>
+    </div>
+  `;
+}
+
+
+// ─── URGENCE ──────────────────────────────────────────────────
+function renderUrgence() {
+  return `
+    <button class="btn-urgence" data-action="urgence">
+      <span style="font-size:1.4em;">🆘</span>
+      <span class="urgence-label">${T.urgence_label}</span>
+    </button>
+  `;
+}
+
+// ─── BOUTON LIEN SIMPLE ───────────────────────────────────────
+function renderLinkBtn(label, url) {
+  return `
+    <a href="${url}" target="_blank" class="btn-main" style="margin-bottom:10px;">
+      <span class="label">${label}</span>
+    </a>
+  `;
+}
+
+// ─── RÈGLES ───────────────────────────────────────────────────
+function renderRegles() {
+  const isOpen = openSubmenu === 'regles';
+  return `
+    <div class="submenu">
+      <button class="submenu-header ${isOpen ? 'open' : ''}" data-toggle="regles">
+        <span class="label">${T.regles_label}</span>
+        <span style="display:flex;align-items:center;gap:4px;">${iconWifi()}${iconExclaim()}</span>
+      </button>
+      <div class="submenu-body ${isOpen ? 'open' : ''}">
+        <div class="sub-item">
+          <h3>${T.regles_rng_titre}</h3>
+          <p>${T.regles_rng_desc}</p>
+        </div>
+        <div class="sub-item">
+          <h3>${T.regles_carte_titre}</h3>
+          <p>${T.regles_carte_desc}</p>
+        </div>
+        <div class="sub-item">
+          <h3>${T.regles_machine_titre} — ${MAS_ID}</h3>
+          <p>${T.regles_machine_desc}</p>
+        </div>
+        <div class="action-btns">
+          <button class="btn-action" data-action="explication">${T.regles_humain}</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ─── PLAY IT SAFE ─────────────────────────────────────────────
+function renderPlaySafe() {
+  const isOpen = openSubmenu === 'playsafe';
+  return `
+    <div class="submenu">
+      <button class="submenu-header ${isOpen ? 'open' : ''}" data-toggle="playsafe">
+        <span class="label">${T.playsafe_label}</span>
+      </button>
+      <div class="submenu-body ${isOpen ? 'open' : ''}">
+        <div class="sub-item">
+          <h3>${T.playsafe_titre}</h3>
+          <p>${T.playsafe_desc}</p>
+          <div class="action-btns">
+            <a href="mailto:prevention@casino.com" class="btn-action">${T.playsafe_cta}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ─── OBYPAY ───────────────────────────────────────────────────
+function renderObypay() {
+  return renderLinkBtn(T.obypay_label, LINKS.obypay);
+}
+
+// ─── RESTAURATION ─────────────────────────────────────────────
+function renderRestauration() {
+  const isOpen = openSubmenu === 'resto';
+  return `
+    <div class="submenu">
+      <button class="submenu-header ${isOpen ? 'open' : ''}" data-toggle="resto">
+        <span class="label">${T.resto_label}</span>
+      </button>
+      <div class="submenu-body ${isOpen ? 'open' : ''}">
+
+        <div class="sub-item">
+          <h3>Snack Bar</h3>
+          <p>${T.snack_desc}</p>
+          <div class="action-btns">
+            <button class="btn-action" onclick="window.open('${LINKS.snack_commande}','_blank')">${T.commander}</button>
+          </div>
+        </div>
+
+        <div class="sub-item">
+          <h3>Restaurant Purple</h3>
+          <p>${T.purple_desc}</p>
+          <div class="action-btns">
+            <button class="btn-action secondary" onclick="window.open('${LINKS.purple_carte}','_blank')">${T.telecharger}</button>
+            <button class="btn-action" onclick="window.open('${LINKS.purple_reserve}','_blank')">${T.reserver}</button>
+          </div>
+        </div>
+
+        <div class="sub-item">
+          <h3>Restaurant Les Roses</h3>
+          <p>${T.roses_desc}</p>
+          <div class="action-btns">
+            <button class="btn-action secondary" onclick="window.open('${LINKS.roses_carte}','_blank')">${T.telecharger}</button>
+            <button class="btn-action" onclick="window.open('${LINKS.roses_reserve}','_blank')">${T.reserver}</button>
+          </div>
+        </div>
+
+        <div class="sub-item">
+          <h3>Cooper's</h3>
+          <p>${T.coopers_desc}</p>
+        </div>
+
+        <div class="sub-item">
+          <h3>Offside</h3>
+          <p>${T.offside_desc}</p>
+          <div class="action-btns">
+            <button class="btn-action secondary" onclick="window.open('${LINKS.offside_carte}','_blank')">${T.telecharger}</button>
+            <button class="btn-action" onclick="window.open('${LINKS.offside_reserve}','_blank')">${T.reserver}</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  `;
+}
+
+// ─── HÔTEL ────────────────────────────────────────────────────
+function renderHotel() {
+  const isOpen = openSubmenu === 'hotel';
+  const hour   = new Date().getHours();
+  const isLate = hour >= 0 && hour < 4;
+
+  const hotelContent = isLate
+    ? `<div class="sub-item">
+        <p style="color:#aaa;font-size:0.85em;margin-bottom:10px;">Les réservations en ligne sont fermées.</p>
+        <div class="action-btns">
+          <a href="tel:+352584521" class="btn-action">${T.hotel_nuit_cta}</a>
+        </div>
+       </div>`
+    : `<div class="sub-item">
+        <div class="action-btns">
+          <a href="${LINKS.hotel}" target="_blank" class="btn-action">${T.hotel_jour}</a>
+          <a href="${LINKS.hotel_guest_directory}" target="_blank" class="btn-action secondary">Guest Directory</a>
+        </div>
+       </div>`;
+
+  return `
+    <div class="submenu">
+      <button class="submenu-header ${isOpen ? 'open' : ''}" data-toggle="hotel">
+        <span class="label">${T.hotel_label}</span>
+      </button>
+      <div class="submenu-body ${isOpen ? 'open' : ''}">
+        ${hotelContent}
+      </div>
+    </div>
+  `;
+}
+
+// ─── FOOTER SOCIAL ────────────────────────────────────────────
+function renderFooterSocial() {
+  return `
+    <div class="footer-social">
+      <a href="${LINKS.instagram}" target="_blank" aria-label="Instagram">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+        </svg>
+      </a>
+      <a href="${LINKS.youtube}" target="_blank" aria-label="YouTube">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/>
+          <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/>
+        </svg>
+      </a>
+      <a href="${LINKS.facebook}" target="_blank" aria-label="Facebook">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+        </svg>
+      </a>
+      <a href="${LINKS.linkedin}" target="_blank" aria-label="LinkedIn">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+          <rect x="2" y="9" width="4" height="12"/>
+          <circle cx="4" cy="4" r="2"/>
+        </svg>
+      </a>
+      <a href="${LINKS.site}" target="_blank" aria-label="Site web">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+      </a>
+    </div>
+  `;
+}
+
+// ─── OVERLAYS ─────────────────────────────────────────────────
+function renderOverlays() {
+  document.querySelectorAll('.confirm-overlay, .merci-overlay').forEach(el => el.remove());
+
+  if (confirmAction) {
+    const icons = { urgence:'🆘', technique:'🔧', physique:'🙋', explication:'🎲' };
+    const icon  = icons[confirmAction] || '❓';
+    const div   = document.createElement('div');
+    div.className = 'confirm-overlay';
+    div.innerHTML = `
+      <div class="confirm-card">
+        <div class="big-icon">${icon}</div>
+        <h2>${T.confirm_title}</h2>
+        <p>${T.confirm_body} <strong>${MAS_ID}</strong></p>
+        <div class="confirm-btns">
+          <button class="btn-confirm-send" id="btnConfirmSend">${T.confirm_send}</button>
+          <button class="btn-confirm-cancel" id="btnConfirmCancel">${T.confirm_cancel}</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(div);
+    document.getElementById('btnConfirmSend').addEventListener('click', sendAlert);
+    document.getElementById('btnConfirmCancel').addEventListener('click', () => {
+      confirmAction = null; render();
+    });
+  }
+
+  if (showMerci) {
+    const div = document.createElement('div');
+    div.className = 'merci-overlay';
+    div.innerHTML = `
+      <div class="merci-card">
+        <div class="big-icon">✅</div>
+        <h2>${T.merci_title}</h2>
+        <p>${T.merci_body}</p>
+        <button class="btn-merci-retour" id="btnMerciRetour">${T.merci_retour}</button>
+      </div>
+    `;
+    document.body.appendChild(div);
+    document.getElementById('btnMerciRetour').addEventListener('click', () => {
+      showMerci = false; render();
+    });
+  }
+}
+
+// ─── BIND EVENTS ──────────────────────────────────────────────
+function bindEvents() {
+  document.querySelectorAll('[data-action]').forEach(el => {
+    el.addEventListener('click', () => {
+      const action = el.dataset.action;
+      if (['urgence','technique','physique','explication'].includes(action)) {
+        confirmAction = action;
+        renderOverlays();
+      }
+    });
+  });
+
+  document.querySelectorAll('[data-toggle]').forEach(el => {
+    el.addEventListener('click', () => {
+      const key = el.dataset.toggle;
+      openSubmenu = openSubmenu === key ? null : key;
+      render();
+    });
+  });
+}
+
+// ─── SEND ALERT ───────────────────────────────────────────────
+async function sendAlert() {
+  if (isSending) return;
+  isSending = true;
+
+  const now      = new Date();
+  const position = MAS_POSITION[MAS_ID] || 'Position inconnue';
+
+  const templateParams = {
+    type:     confirmAction,
+    machine:  MAS_ID,
+    heure:    now.toLocaleTimeString('fr-FR'),
+    date:     now.toLocaleDateString('fr-FR'),
+    position: position,
+    plan_url: `https://www.dropbox.com/scl/fi/06vs4a3u81mwgy9gec8pj/plan_casino.pdf?rlkey=og53hlfi0bhtwbvnxr96ixpdq&st=lhr3vce6&dl=0`
+  };
+
+  try {
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+    console.log('✅ Email envoyé');
+  } catch (err) {
+    console.error('❌ Erreur EmailJS :', err);
+  }
+
+  confirmAction = null;
+  showMerci     = true;
+  isSending     = false;
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
