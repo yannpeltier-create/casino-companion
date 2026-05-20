@@ -873,11 +873,14 @@ async function sendAlert() {
 
   try {
     await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-      mas_id:    MAS_ID,
-      position:  position,
-      timestamp: timestamp,
-      type:      confirmAction || 'alerte',
-      plan_url:  planUrl,           // ← NOUVEAU
+  mas_id:   rawMas,
+  position: machinePosition,
+  date:     date,
+  heure:    heure,
+  type:     confirmAction || 'alerte',
+  plan_url: planImage,
+});
+
     });
     confirmAction = null;
     showMerci     = true;
