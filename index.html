@@ -860,27 +860,24 @@ async function sendAlert() {
   document.getElementById('btnSend') &&
     (document.getElementById('btnSend').disabled = true);
 
-  const now       = new Date();
-  const timestamp = now.toLocaleString('fr-FR');
-  const position  = masConfig.position || 'Position inconnue';
+  const now      = new Date();
+  const date     = now.toLocaleDateString('fr-FR');
+  const heure    = now.toLocaleTimeString('fr-FR');
+  const position = masConfig.position || 'Position inconnue';
+  const masLabel = MAS_ID.replace('MAS-', '');
 
-  // ── URL plan avec MAS surlignée ──────────────────────────────
-  const masLabel = MAS_ID.replace('MAS-', ''); // ex: "1034"
-  const planUrl  =
+  const planUrl =
     `https://yannpeltier-create.github.io/casino-companion/plan.html` +
-    `?mas=${masLabel}` +
-    `&ts=${encodeURIComponent(timestamp)}`;
+    `?mas=${masLabel}`;
 
   try {
     await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-  mas_id:   rawMas,
-  position: machinePosition,
-  date:     date,
-  heure:    heure,
-  type:     confirmAction || 'alerte',
-  plan_url: planImage,
-});
-
+      mas_id:   MAS_ID,
+      position: position,
+      date:     date,
+      heure:    heure,
+      type:     confirmAction || 'alerte',
+      plan_url: planUrl,
     });
     confirmAction = null;
     showMerci     = true;
@@ -893,6 +890,7 @@ async function sendAlert() {
     render();
   }
 }
+
 
 
 // ─── EVENTS ───────────────────────────────────────────────────
