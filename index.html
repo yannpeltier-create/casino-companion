@@ -853,15 +853,22 @@ function renderOverlays() {
   }
 }
 
-// ─── ENVOI ALERTE ─────────────────────────────────────────────
 async function sendAlert() {
   if (isSending) return;
   isSending = true;
-  document.getElementById('btnSend') && (document.getElementById('btnSend').disabled = true);
+  document.getElementById('btnSend') &&
+    (document.getElementById('btnSend').disabled = true);
 
-  const now = new Date();
+  const now       = new Date();
   const timestamp = now.toLocaleString('fr-FR');
   const position  = masConfig.position || 'Position inconnue';
+
+  // ── URL plan avec MAS surlignée ──────────────────────────────
+  const masLabel = MAS_ID.replace('MAS-', ''); // ex: "1034"
+  const planUrl  =
+    `https://yannpeltier-create.github.io/casino-companion/plan.html` +
+    `?mas=${masLabel}` +
+    `&ts=${encodeURIComponent(timestamp)}`;
 
   try {
     await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
@@ -869,18 +876,20 @@ async function sendAlert() {
       position:  position,
       timestamp: timestamp,
       type:      confirmAction || 'alerte',
+      plan_url:  planUrl,           // ← NOUVEAU
     });
     confirmAction = null;
     showMerci     = true;
   } catch (e) {
     console.error('EmailJS error', e);
     confirmAction = null;
-    showMerci     = true; // show merci anyway for UX
+    showMerci     = true;
   } finally {
     isSending = false;
     render();
   }
 }
+
 
 // ─── EVENTS ───────────────────────────────────────────────────
 function bindEvents() {
