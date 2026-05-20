@@ -185,9 +185,10 @@ const params = new URLSearchParams(window.location.search);
 const MAS_ID = params.get('mas') || 'MAS-000';
 
 const MAS_CONFIG = {
-  'MAS-1034': { position: 'MAIN', zone_livraison: true  },
-  'MAS-1183': { position: 'DOME', zone_livraison: false },
+  'MAS-1001': { position: 'Zone MAIN', zone: 'MAIN', zone_livraison: true  },
+  'MAS-1041': { position: 'Zone DOME', zone: 'DOME', zone_livraison: false },
 };
+
 
 const masConfig      = MAS_CONFIG[MAS_ID] || { position: 'Position inconnue', zone_livraison: false };
 const ZONE_LIVRAISON = masConfig.zone_livraison;
