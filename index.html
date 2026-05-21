@@ -223,20 +223,10 @@ const LINKS = {
 };
 
 // ─── RÉSEAU ───────────────────────────────────────────────────
-async function checkCasinoNetwork() {
-  if (new URLSearchParams(window.location.search).has('demo')) {
-    isCasinoWifi = true;
-    return;
-  }
-  try {
-    const res = await fetch('/api/internal/ping', { cache: 'no-store' });
-    if (!res.ok) throw new Error();
-    const data = await res.json();
-    isCasinoWifi = data && data.ok === true;
-  } catch (e) {
-    isCasinoWifi = false;
-  }
+function isProtected(action) {
+  return ['technique', 'physique'].includes(action);
 }
+
 
 
 // ─── TRADUCTIONS ──────────────────────────────────────────────
