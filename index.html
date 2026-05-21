@@ -892,6 +892,10 @@ async function sendAlert() {
 
 // ─── EVENTS ───────────────────────────────────────────────────
 function bindEvents() {
+  function isProtected(action) {
+  return ['technique', 'physique'].includes(action);
+}
+
   // Submenu toggles
   document.querySelectorAll('[data-toggle]').forEach(btn => {
     btn.addEventListener('click', () => {
