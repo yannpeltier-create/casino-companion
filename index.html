@@ -852,7 +852,7 @@ async function sendAlert() {
   // Jeu actif — uniquement pour physique et explication
   let jeuNom = null;
   let jeuVideoUrl = null;
-  if (confirmAction === 'physique' || confirmAction === 'explication') {
+  if (confirmAction === 'physique' || confirmAction === 'technique' || confirmAction === 'explication') {
     const jeuId = masConfig.jeu_actif;
     const jeu   = jeuId ? JEU_CONFIG[jeuId] : null;
     if (jeu) {
