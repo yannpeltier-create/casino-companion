@@ -583,25 +583,22 @@ function render() {
   renderOverlays();
 }
 
-// ─── TOP ROW ──────────────────────────────────────────────────
+/ ─── TOP ROW ──────────────────────────────────────────────────
 function renderTopRow() {
-  const disabled = !isCasinoWifi;
-  const cls = disabled ? 'btn-top btn-disabled' : 'btn-top';
   return `
     <div class="row-top">
-      <button class="${cls}" data-action="technique">
+      <button class="btn-top" data-action="technique">
         <span class="btn-label">${T.technique_label}</span>
         <span class="btn-sub">${T.technique_sub}</span>
-        ${disabled ? `<span class="btn-wifi">${T.wifi_requis}</span>` : ''}
       </button>
-      <button class="${cls}" data-action="physique">
+      <button class="btn-top" data-action="physique">
         <span class="btn-label">${T.physique_label}</span>
         <span class="btn-sub">${T.physique_sub}</span>
-        ${disabled ? `<span class="btn-wifi">${T.wifi_requis}</span>` : ''}
       </button>
     </div>
   `;
 }
+
 
 // ─── URGENCE ──────────────────────────────────────────────────
 function renderUrgence() {
@@ -657,11 +654,11 @@ function renderRegles() {
         </button>
         <div class="inner-accordion-body ${iMach ? 'open' : ''}">
           <div class="action-btns">
-            <button class="btn-action ${!isCasinoWifi ? 'disabled' : ''}" data-action="explication">
-              ${T.regles_humain}${!isCasinoWifi ? ' — ' + T.wifi_requis : ''}
+            <button class="btn-action" data-action="explication">
+              ${T.regles_humain}
             </button>
-            <button class="btn-action secondary ${!isCasinoWifi ? 'disabled' : ''}" data-action="tutorial">
-              ${T.regles_tutorial}${!isCasinoWifi ? ' — ' + T.wifi_requis : ''}
+            <button class="btn-action secondary" data-action="tutorial">
+              ${T.regles_tutorial}
             </button>
           </div>
         </div>
