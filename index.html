@@ -546,18 +546,6 @@ const TRANSLATIONS = {
 const browserLang = (navigator.language || 'fr').slice(0, 2).toLowerCase();
 const T = TRANSLATIONS[browserLang] || TRANSLATIONS['fr'];
 
-// ─── RÉSEAU ───────────────────────────────────────────────────
-async function checkCasinoNetwork() {
-  try {
-    const res = await fetch('/api/internal/ping', { cache: 'no-store' });
-    if (!res.ok) throw new Error();
-    const data = await res.json();
-    isCasinoWifi = data && data.ok === true;
-  } catch (e) {
-    isCasinoWifi = false;
-  }
-}
-
 // ─── RENDER ───────────────────────────────────────────────────
 function render() {
   const app = document.getElementById('app');
