@@ -900,33 +900,16 @@ async function sendAlert() {
 
 
 // ─── EVENTS ───────────────────────────────────────────────────
-function () {
+function bindEvents() {
   // Submenu toggles
-  ddocument.querySelectorAll('[data-action]').forEach(el => {
-  el.addEventListener('click', () => {
-    const action = el.dataset.action;
-
-    // Tutorial → ouvre la vidéo directement, pas de modale
-    if (action === 'tutorial') {
-      const jeuId = masConfig.jeu_actif;
-      const jeu   = jeuId ? JEU_CONFIG[jeuId] : null;
-      if (jeu && jeu.video_url) {
-        window.open(jeu.video_url, '_blank');
-      }
-      return;
-    }
-
-    if (isProtected(action) && !isCasinoWifi) {
-      showWifiModal();
-      return;
-    }
-
-    if (['urgence','technique','physique','explication'].includes(action)) {
-      confirmAction = action;
-      renderOverlays();
-    }
+  document.querySelectorAll('[data-toggle]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.toggle;
+      openSubmenu = openSubmenu === key ? null : key;
+      if (openSubmenu !== 'regles') openInner = null;
+      render();
+    });
   });
-});
 
   // Inner accordion
   document.querySelectorAll('[data-inner]').forEach(btn => {
@@ -938,23 +921,33 @@ function () {
   });
 
   // Action buttons
-  document.querySelectorAll('[data-action]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const action = btn.dataset.action;
+  document.querySelectorAll('[data-action]').forEach(el => {
+    el.addEventListener('click', () => {
+      const action = el.dataset.action;
 
-      // Bloque uniquement si WiFi absent ET action protégée
-      if (!isCasinoWifi && isProtected(action)) {
+      // Tutorial → ouvre la vidéo directement, pas de modale
+      if (action === 'tutorial') {
+        const jeuId = masConfig.jeu_actif;
+        const jeu   = jeuId ? JEU_CONFIG[jeuId] : null;
+        if (jeu && jeu.video_url) {
+          window.open(jeu.video_url, '_blank');
+        }
+        return;
+      }
+
+      if (isProtected(action) && !isCasinoWifi) {
         showWifiModal();
         return;
       }
 
-      if (['urgence','technique','physique','explication','tutorial'].includes(action)) {
+      if (['urgence','technique','physique','explication'].includes(action)) {
         confirmAction = action;
         renderOverlays();
       }
     });
   });
 }
+
 
 
 // ─── INIT ─────────────────────────────────────────────────────
