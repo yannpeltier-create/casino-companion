@@ -185,6 +185,7 @@ const params = new URLSearchParams(window.location.search);
 const MAS_ID = params.get('mas') || 'MAS-000';
 
 const MAS_CONFIG = {
+  'MAS-DEMO': { position: 'Zone MAIN', zone_livraison: true, jeu_actif: 'jeu_demo' },
   'MAS-1001': { position: 'Zone MAIN', zone: 'MAIN', zone_livraison: true  },
   'MAS-1041': { position: 'Zone DOME', zone: 'DOME', zone_livraison: false },
 };
@@ -192,6 +193,13 @@ const MAS_CONFIG = {
 
 const masConfig      = MAS_CONFIG[MAS_ID] || { position: 'Position inconnue', zone_livraison: false };
 const ZONE_LIVRAISON = masConfig.zone_livraison;
+const JEU_CONFIG = {
+  'jeu_demo': {
+    nom:       'Dragon Trio',
+    video_url: 'https://github.com/yannpeltier-create/casino-companion/releases/download/explication/Dragon.Trio.mp4',  // ← ton lien Release
+  },
+};
+
 
 const LINKS = {
   hotel:                 'https://casino2000.lu/fr/hotel-casino-2000/',
@@ -847,39 +855,47 @@ function renderOverlays() {
 async function sendAlert() {
   if (isSending) return;
   isSending = true;
-  document.getElementById('btnSend') &&
-    (document.getElementById('btnSend').disabled = true);
 
   const now      = new Date();
-  const date     = now.toLocaleDateString('fr-FR');
-  const heure    = now.toLocaleTimeString('fr-FR');
-  const position = masConfig.position || 'Position inconnue';
-  const masLabel = MAS_ID.replace('MAS-', '');
+  const position = masConfig.position;
 
-  const planUrl =
-    `https://yannpeltier-create.github.io/casino-companion/plan.html` +
-    `?mas=${masLabel}`;
-
-  try {
-    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-      mas_id:   MAS_ID,
-      position: position,
-      date:     date,
-      heure:    heure,
-      type:     confirmAction || 'alerte',
-      plan_url: planUrl,
-    });
-    confirmAction = null;
-    showMerci     = true;
-  } catch (e) {
-    console.error('EmailJS error', e);
-    confirmAction = null;
-    showMerci     = true;
-  } finally {
-    isSending = false;
-    render();
+  // Jeu actif — uniquement pour physique et explication
+  let jeuNom = null;
+  let jeuVideoUrl = null;
+  if (confirmAction === 'physique' || confirmAction === 'explication') {
+    const jeuId = masConfig.jeu_actif;
+    const jeu   = jeuId ? JEU_CONFIG[jeuId] : null;
+    if (jeu) {
+      jeuNom      = jeu.nom;
+      jeuVideoUrl = jeu.video_url;
+    }
   }
+
+  // Payload EmailJS
+  const templateParams = {
+    type:       confirmAction,
+    machine:    MAS_ID,
+    position:   position,
+    date:       now.toLocaleString('fr-FR'),
+    jeu_nom:    jeuNom     || '—',
+    jeu_video:  jeuVideoUrl || '—',
+  };
+
+  let success = false;
+  try {
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+    success = true;
+  } catch (e) {
+    success = false;
+  }
+
+  confirmAction = null;
+  isSending     = false;
+  showMerci     = success;
+  showError     = !success;
+  render();
 }
+
 
 
 
