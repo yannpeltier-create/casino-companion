@@ -922,15 +922,22 @@ function bindEvents() {
   // Action buttons
   document.querySelectorAll('[data-action]').forEach(btn => {
     btn.addEventListener('click', () => {
-      if (btn.classList.contains('disabled') || btn.classList.contains('btn-disabled')) return;
       const action = btn.dataset.action;
-      if (action === 'urgence' || action === 'technique' || action === 'physique' || action === 'explication') {
+
+      // Bloque uniquement si WiFi absent ET action protégée
+      if (!isCasinoWifi && isProtected(action)) {
+        showWifiModal();
+        return;
+      }
+
+      if (['urgence','technique','physique','explication','tutorial'].includes(action)) {
         confirmAction = action;
         renderOverlays();
       }
     });
   });
 }
+
 
 // ─── INIT ─────────────────────────────────────────────────────
 (async function init() {
