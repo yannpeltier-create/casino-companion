@@ -196,7 +196,7 @@ const ZONE_LIVRAISON = masConfig.zone_livraison;
 const JEU_CONFIG = {
   'jeu_demo': {
     nom:       'Dragon Trio',
-    video_url: 'https://github.com/yannpeltier-create/casino-companion/releases/download/explication/Dragon.Trio.mp4',  // ← ton lien Release
+    video_url: 'https://youtu.be/dj0_mmQwcMk',  // ← ton lien Release
   },
 };
 
@@ -902,14 +902,31 @@ async function sendAlert() {
 // ─── EVENTS ───────────────────────────────────────────────────
 function bindEvents() {
   // Submenu toggles
-  document.querySelectorAll('[data-toggle]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const key = btn.dataset.toggle;
-      openSubmenu = openSubmenu === key ? null : key;
-      if (openSubmenu !== 'regles') openInner = null;
-      render();
-    });
+  ddocument.querySelectorAll('[data-action]').forEach(el => {
+  el.addEventListener('click', () => {
+    const action = el.dataset.action;
+
+    // Tutorial → ouvre la vidéo directement, pas de modale
+    if (action === 'tutorial') {
+      const jeuId = masConfig.jeu_actif;
+      const jeu   = jeuId ? JEU_CONFIG[jeuId] : null;
+      if (jeu && jeu.video_url) {
+        window.open(jeu.video_url, '_blank');
+      }
+      return;
+    }
+
+    if (isProtected(action) && !isCasinoWifi) {
+      showWifiModal();
+      return;
+    }
+
+    if (['urgence','technique','physique','explication'].includes(action)) {
+      confirmAction = action;
+      renderOverlays();
+    }
   });
+});
 
   // Inner accordion
   document.querySelectorAll('[data-inner]').forEach(btn => {
