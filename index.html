@@ -867,16 +867,16 @@ async function sendAlert() {
 let emailType = confirmAction;
 
 if (confirmAction === 'physique') {
-  emailType = 'assistance';
+  emailType = 'ASSISTANCE';
 }
 if (confirmAction === 'technique') {
-  emailType = 'panne';
+  emailType = 'PANNE';
 }
 if (confirmAction === 'urgence') {
-  emailType = 'urgence';
+  emailType = 'URGENCE VITALE';
 }
 if (confirmAction === 'explication') {
-  emailType = 'explication';
+  emailType = 'EXPLICATION';
 }
 
 const templateParams = {
