@@ -850,51 +850,41 @@ async function sendAlert() {
   const now      = new Date();
   const position = masConfig.position;
 
-  // Jeu actif — uniquement pour physique et explication
-  let jeuNom = null;
-  let jeuVideoUrl = null;
-  if (confirmAction === 'physique' || confirmAction === 'technique' || confirmAction === 'explication') {
-    const jeuId = masConfig.jeu_actif;
-    const jeu   = jeuId ? JEU_CONFIG[jeuId] : null;
-    if (jeu) {
-      jeuNom      = jeu.nom;
-      jeuVideoUrl = jeu.video_url;
-    }
+  // Jeu actif
+  const jeuId = masConfig.jeu_actif;
+  const jeu   = jeuId ? JEU_CONFIG[jeuId] : null;
+
+  // Charger le plan PNG en base64
+  let planBase64 = '';
+  try {
+    const response = await fetch('/assets/plan_casino_MAS-1001.png');
+    const blob     = await response.blob();
+    planBase64     = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+  } catch(e) {
+    console.warn('Plan PNG non chargé', e);
+    planBase64 = '';
   }
 
-  // Payload EmailJS
-  // Mapping propre des libellés email
-let emailType = confirmAction;
-
-if (confirmAction === 'physique') {
-  emailType = 'ASSISTANCE';
-}
-if (confirmAction === 'technique') {
-  emailType = 'PANNE';
-}
-if (confirmAction === 'urgence') {
-  emailType = 'URGENCE VITALE';
-}
-if (confirmAction === 'explication') {
-  emailType = 'EXPLICATION';
-}
-
-const templateParams = {
-  type:       emailType,
-  machine:    MAS_ID,
-  position:   position,
-  date:       now.toLocaleString('fr-FR'),
-  jeu_nom:    jeuNom     || '—',
-  jeu_video:  jeuVideoUrl || '—',
-  plan_url:   '—',
-};
-
+  const templateParams = {
+    type:        confirmAction,
+    machine:     MAS_ID,
+    position:    position,
+    date:        now.toLocaleString('fr-FR'),
+    jeu_nom:     jeu?.nom     || '—',
+    jeu_video:   jeu?.video_url || '—',
+    plan_image:  planBase64,
+  };
 
   let success = false;
   try {
     await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
     success = true;
-  } catch (e) {
+  } catch(e) {
+    console.error('EmailJS error', e);
     success = false;
   }
 
