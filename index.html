@@ -863,7 +863,7 @@ async function sendAlert() {
 
   // Payload EmailJS
   const templateParams = {
-    type: confirmAction === 'physique' ? 'assistance' : confirmAction,
+    type:       confirmAction,
     machine:    MAS_ID,
     position:   position,
     date:       now.toLocaleString('fr-FR'),
