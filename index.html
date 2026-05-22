@@ -854,29 +854,15 @@ async function sendAlert() {
   const jeuId = masConfig.jeu_actif;
   const jeu   = jeuId ? JEU_CONFIG[jeuId] : null;
 
-  // Charger le plan PNG en base64
-  let planBase64 = '';
-  try {
-    const response = await fetch('/assets/plan_casino_MAS-1001.png');
-    const blob     = await response.blob();
-    planBase64     = await new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.readAsDataURL(blob);
-    });
-  } catch(e) {
-    console.warn('Plan PNG non chargé', e);
-    planBase64 = '';
-  }
-
-  const templateParams = {
+    const templateParams = {
     type:        confirmAction,
     machine:     MAS_ID,
     position:    position,
     date:        now.toLocaleString('fr-FR'),
     jeu_nom:     jeu?.nom     || '—',
     jeu_video:   jeu?.video_url || '—',
-    plan_image:  planBase64,
+    plan_image: 'https://i.ibb.co/GQcKnv01/plan_casino_MAS-1001.png',
+
   };
 
   let success = false;
