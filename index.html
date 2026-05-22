@@ -655,25 +655,28 @@ function renderRegles() {
   `;
 }
 
+// ─── PLAY IT SAFE ─────────────────────────────────────────────
 function renderPlaySafe() {
   const isOpen = openSubmenu === 'playsafe';
   return `
     <div class="submenu">
+      <a href="${LINKS.playsafe_email}" class="btn-action secondary">
+        ${T.playsafe_cta}
+      </a>
       <div class="submenu-body ${isOpen ? 'open' : ''}">
         <div class="sub-item">
           <h3>${T.playsafe_titre}</h3>
           <p>${T.playsafe_desc}</p>
           <div class="action-btns">
-            <a href="${LINKS.playsafe_email}" class="btn-action secondary">
+            <button class="btn-action secondary" data-action="playsafe_contact">
               ${T.playsafe_cta}
-            </a>
+            </button>
           </div>
         </div>
       </div>
     </div>
   `;
 }
-
 
 // ─── OBYPAY ───────────────────────────────────────────────────
 function renderObypay() {
