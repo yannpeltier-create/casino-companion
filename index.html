@@ -658,9 +658,9 @@ function renderPlaySafe() {
   const isOpen = openSubmenu === 'playsafe';
   return `
     <div class="submenu">
-      <button class="submenu-header" data-toggle="playsafe">
-        <span class="label">${T.playsafe_label}</span>
-      </button>
+      <a href="${LINKS.playsafe_email}" class="btn-action secondary">
+       ${T.playsafe_cta}
+      </a>
       <div class="submenu-body ${isOpen ? 'open' : ''}">
         <div class="sub-item">
           <h3>${T.playsafe_titre}</h3>
