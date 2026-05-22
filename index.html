@@ -863,15 +863,32 @@ async function sendAlert() {
   }
 
   // Payload EmailJS
-  const templateParams = {
-    type:       confirmAction,
-    machine:    MAS_ID,
-    position:   position,
-    date:       now.toLocaleString('fr-FR'),
-    jeu_nom:    jeuNom     || '—',
-    jeu_video:  jeuVideoUrl || '—',
-    plan_url:   '—',
-  };
+  // Mapping propre des libellés email
+let emailType = confirmAction;
+
+if (confirmAction === 'physique') {
+  emailType = 'assistance';
+}
+if (confirmAction === 'technique') {
+  emailType = 'panne';
+}
+if (confirmAction === 'urgence') {
+  emailType = 'urgence';
+}
+if (confirmAction === 'explication') {
+  emailType = 'explication';
+}
+
+const templateParams = {
+  type:       emailType,
+  machine:    MAS_ID,
+  position:   position,
+  date:       now.toLocaleString('fr-FR'),
+  jeu_nom:    jeuNom     || '—',
+  jeu_video:  jeuVideoUrl || '—',
+  plan_url:   '—',
+};
+
 
   let success = false;
   try {
