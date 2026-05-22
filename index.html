@@ -220,6 +220,7 @@ const LINKS = {
   linkedin:              'https://www.linkedin.com/company/8289354/admin/feed/posts/',
   site:                  'https://casino2000.lu/',
   coopers_carte:         'https://casino2000.lu/wp-content/uploads/2023/10/CPR_Carte_decembre-2025.pdf',
+  playsafe_email:        'yann.peltier@gmail.com',
 };
 
 // ─── RÉSEAU ───────────────────────────────────────────────────
@@ -934,6 +935,10 @@ function bindEvents() {
         showWifiModal();
         return;
       }
+     if (action === 'playsafe') {
+        window.location.href = `mailto:${LINKS.playsafe_email}`;
+     return;
+     }
 
       if (['urgence','technique','physique','explication'].includes(action)) {
         confirmAction = action;
