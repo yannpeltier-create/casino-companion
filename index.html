@@ -855,7 +855,7 @@ async function sendAlert() {
   const jeu   = jeuId ? JEU_CONFIG[jeuId] : null;
 
     const templateParams = {
-    type:        confirmAction,
+    type: (confirmAction === 'physique' || confirmAction === 'explication') ? 'assistance' : confirmAction,
     machine:     MAS_ID,
     position:    position,
     date:        now.toLocaleString('fr-FR'),
